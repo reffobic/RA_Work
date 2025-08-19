@@ -24,9 +24,17 @@ def load_hdf5_data(filename):
         
         # Load all data into pandas DataFrame
         data = {}
+        min_length = float('inf')
+        
+        # First pass: find minimum length
         for col in hf.keys():
             if col != 'metadata':
-                data[col] = hf[col][:]
+                min_length = min(min_length, len(hf[col]))
+        
+        # Second pass: load data with consistent length
+        for col in hf.keys():
+            if col != 'metadata':
+                data[col] = hf[col][:min_length]
         
         df = pd.DataFrame(data)
         print(f"\nLoaded {len(df)} data points")

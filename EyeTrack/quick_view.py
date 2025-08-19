@@ -38,6 +38,16 @@ def quick_view(filename):
             sample_size = min(1000, total_points)
             sample_data = {}
             
+            # Find the minimum length across all datasets
+            min_length = float('inf')
+            for dataset_name in hf.keys():
+                if dataset_name != 'metadata':
+                    dataset = hf[dataset_name]
+                    min_length = min(min_length, len(dataset))
+            
+            # Use the minimum length to ensure all arrays are the same size
+            sample_size = min(sample_size, min_length)
+            
             for dataset_name in hf.keys():
                 if dataset_name != 'metadata':
                     dataset = hf[dataset_name]
