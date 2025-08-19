@@ -9,6 +9,9 @@ This repository contains research assistant work projects, including:
 - **analyze_data.py**: Comprehensive data analysis and visualization script
 - **quick_view.py**: Simple script to quickly explore HDF5 data
 
+### GSR Sensor
+- **sketch_aug11a.ino**: Arduino sketch for GSR sensor with dynamic baseline and phasic threshold detection
+
 
 
 ## Getting Started
@@ -39,12 +42,29 @@ python EyeTrack/analyze_data.py eye_tracking_data_20241201_143022.h5
 python EyeTrack/analyze_data.py eye_tracking_data_20241201_143022.h5 --export hdf5
 ```
 
+### GSR Sensor Analysis
+
+The GSR sensor project provides physiological stress detection:
+
+1. **Hardware Setup**: Connect GSR sensor to Arduino A0 pin
+2. **Data Collection**: Upload `sketch_aug11a.ino` to Arduino
+3. **Stress Detection**: Monitor serial output for stress events
+4. **Parameters**: Adjust `PHASIC_THRESHOLD` and `REFRACTORY_PERIOD` for sensitivity
+
+**Features:**
+- Dynamic baseline tracking
+- Phasic threshold detection
+- Kalman filtering for noise reduction
+- Refractory period to prevent false positives
+
 ## Structure
 
 ```
 RA_Work/
-└── EyeTrack/
-    ├── Scenario.py
-    ├── analyze_data.py
-    └── quick_view.py
+├── EyeTrack/
+│   ├── Scenario.py
+│   ├── analyze_data.py
+│   └── quick_view.py
+└── GSRsensor/
+    └── sketch_aug11a.ino
 ```
