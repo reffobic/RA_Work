@@ -166,36 +166,36 @@ def analyze_stress_levels():
     # Blink rate analysis (high stress = more blinks)
     if blink_rate > STRESS_THRESHOLDS['blink_rate_threshold']:
         stress_score += 25
-        print(f"⚠️  High blink rate detected: {blink_rate:.2f} blinks/sec")
+        print(f"High blink rate detected: {blink_rate:.2f} blinks/sec")
     
     # Scanpath length analysis (high stress = longer scanpath)
     if scanpath_length > STRESS_THRESHOLDS['scanpath_length_threshold']:
         stress_score += 25
-        print(f"⚠️  Long scanpath detected: {scanpath_length:.1f} pixels")
+        print(f"Long scanpath detected: {scanpath_length:.1f} pixels")
     
     # Gaze velocity analysis (high stress = faster gaze)
     if gaze_velocity > STRESS_THRESHOLDS['gaze_velocity_threshold']:
         stress_score += 25
-        print(f"⚠️  High gaze velocity detected: {gaze_velocity:.1f} deg/sec")
+        print(f"High gaze velocity detected: {gaze_velocity:.1f} deg/sec")
     
     # Pupil diameter variance (high stress = more variance)
     if stress_features['pupil_diameter_variance'] > STRESS_THRESHOLDS['pupil_variance_threshold']:
         stress_score += 25
-        print(f"⚠️  High pupil variance detected: {stress_features['pupil_diameter_variance']:.2f}")
+        print(f"High pupil variance detected: {stress_features['pupil_diameter_variance']:.2f}")
     
     # Determine stress level
     if stress_score >= 75:
         stress_level = "HIGH STRESS"
-        print("🚨 HIGH STRESS DETECTED - Consider adaptive interface intervention")
+        print("HIGH STRESS DETECTED")
     elif stress_score >= 50:
         stress_level = "MODERATE STRESS"
-        print("⚠️  MODERATE STRESS DETECTED - Monitor closely")
+        print("MODERATE STRESS DETECTED")
     elif stress_score >= 25:
         stress_level = "LOW STRESS"
-        print("😐 LOW STRESS DETECTED - Normal operation")
+        print("LOW STRESS DETECTED")
     else:
         stress_level = "NO STRESS"
-        print("😊 NO STRESS DETECTED - Optimal performance")
+        print("NO STRESS DETECTED")
     
     return stress_score, stress_level
 
@@ -318,11 +318,11 @@ def ego_sensor_callback(data):
     # Analyze stress levels every 5 seconds (every 300 data points at 60Hz)
     if len(data_buffer) % 300 == 0:
         stress_score, stress_level = analyze_stress_levels()
-        print(f"📊 Current Stress Score: {stress_score}/100 - {stress_level}")
-        print(f"👁️  Blink Count: {stress_features['blink_count']}")
-        print(f"🔄 Scanpath Length: {stress_features['scanpath_length']:.1f}")
-        print(f"⚡ Gaze Velocity: {stress_features['gaze_velocity']:.1f}")
-        print(f"📏 Pupil Variance: {stress_features['pupil_diameter_variance']:.3f}")
+        print(f"Current Stress Score: {stress_score}/100 - {stress_level}")
+        print(f"Blink Count: {stress_features['blink_count']}")
+        print(f"Scanpath Length: {stress_features['scanpath_length']:.1f}")
+        print(f"Gaze Velocity: {stress_features['gaze_velocity']:.1f}")
+        print(f"Pupil Variance: {stress_features['pupil_diameter_variance']:.3f}")
         print("-" * 50)
 
 # Start listening to the ego sensor
@@ -335,8 +335,8 @@ print(f"Write interval: {WRITE_INTERVAL} seconds")
 # Keep the script running to allow listening
 try:
     print("Listening to ego sensor... Press Ctrl+C to stop.")
-    print("🔍 Stress detection is active - monitoring technostress indicators...")
-    print("📊 Stress analysis will be displayed every 5 seconds")
+    print("Stress detection is active - monitoring stress indicators...")
+    print("Stress analysis will be displayed every 5 seconds")
     print("-" * 50)
     while True:
         time.sleep(1)
@@ -348,33 +348,14 @@ except KeyboardInterrupt:
     
     # Final stress analysis
     print("\n" + "="*60)
-    print("📊 FINAL STRESS ANALYSIS REPORT")
+    print("FINAL STRESS ANALYSIS REPORT")
     print("="*60)
     stress_score, stress_level = analyze_stress_levels()
-    print(f"🎯 Final Stress Score: {stress_score}/100")
-    print(f"📈 Stress Level: {stress_level}")
-    print(f"👁️  Total Blinks: {stress_features['blink_count']}")
-    print(f"🔄 Final Scanpath Length: {stress_features['scanpath_length']:.1f}")
-    print(f"⚡ Max Gaze Velocity: {stress_features['gaze_velocity']:.1f}")
-    print(f"📏 Average Pupil Variance: {stress_features['pupil_diameter_variance']:.3f}")
-    
-    # Recommendations based on stress level
-    if stress_score >= 75:
-        print("\n🚨 RECOMMENDATIONS:")
-        print("- Consider adaptive interface intervention")
-        print("- Simplify interface complexity")
-        print("- Provide additional guidance/support")
-        print("- Implement multimodal interaction options")
-    elif stress_score >= 50:
-        print("\n⚠️  RECOMMENDATIONS:")
-        print("- Monitor user behavior closely")
-        print("- Consider interface adjustments")
-        print("- Provide optional assistance")
-    else:
-        print("\n😊 RECOMMENDATIONS:")
-        print("- Current interface is well-suited")
-        print("- User is performing optimally")
-        print("- Consider advanced features")
-    
+    print(f"Final Stress Score: {stress_score}/100")
+    print(f"Stress Level: {stress_level}")
+    print(f"Total Blinks: {stress_features['blink_count']}")
+    print(f"Final Scanpath Length: {stress_features['scanpath_length']:.1f}")
+    print(f"Max Gaze Velocity: {stress_features['gaze_velocity']:.1f}")
+    print(f"Average Pupil Variance: {stress_features['pupil_diameter_variance']:.3f}")
     print("="*60)
     print("Data collection stopped.")
