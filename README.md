@@ -6,6 +6,7 @@ This repository contains research assistant work projects, including:
 
 ### EyeTrack
 - **Scenario.py**: Eye tracking scenario implementation with HDF5 data storage
+- **ScenarioCSV.py**: Eye tracking scenario implementation with CSV data storage
 - **analyze_data.py**: Comprehensive data analysis and visualization script
 - **quick_view.py**: Simple script to quickly explore HDF5 data
 
@@ -20,14 +21,19 @@ Each project directory contains its own documentation and implementation files. 
 
 ### Eye Tracking Data Analysis
 
-The EyeTrack project uses HDF5 format for efficient data storage and analysis:
+The EyeTrack project supports both HDF5 and CSV formats for data storage and analysis:
+
+#### **HDF5 Format (Recommended for Research)**
+- **Efficient storage**: 70-90% compression
+- **Fast queries**: Optimized for large datasets
+- **AI/ML ready**: Direct integration with pandas, numpy
 
 1. **Data Collection**: Run `Scenario.py` to collect eye tracking data
 2. **Quick View**: Use `quick_view.py <filename.h5>` to explore data
 3. **Full Analysis**: Use `analyze_data.py <filename.h5>` for comprehensive analysis
 4. **AI Preparation**: Export data in various formats for machine learning
 
-**Example Usage:**
+**Example Usage (HDF5):**
 ```bash
 # Collect data
 python EyeTrack/Scenario.py
@@ -40,6 +46,20 @@ python EyeTrack/analyze_data.py eye_tracking_data_20241201_143022.h5
 
 # Export for AI/ML
 python EyeTrack/analyze_data.py eye_tracking_data_20241201_143022.h5 --export hdf5
+```
+
+#### **CSV Format (Simple & Compatible)**
+- **Human readable**: Easy to open in Excel, Google Sheets
+- **Universal compatibility**: Works with any data analysis tool
+- **Simple structure**: Standard CSV format
+
+**Example Usage (CSV):**
+```bash
+# Collect data in CSV format
+python EyeTrack/ScenarioCSV.py
+
+# Open CSV file in Excel, Google Sheets, or any CSV viewer
+# Use pandas for analysis: pd.read_csv('eye_tracking_data_20241201_143022.csv')
 ```
 
 ### GSR Sensor Analysis
@@ -63,6 +83,7 @@ The GSR sensor project provides physiological stress detection:
 RA_Work/
 ├── EyeTrack/
 │   ├── Scenario.py
+│   ├── ScenarioCSV.py
 │   ├── analyze_data.py
 │   └── quick_view.py
 └── GSRsensor/
