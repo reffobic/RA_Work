@@ -9,10 +9,7 @@ This repository contains research assistant work projects, including:
 - **analyze_data.py**: Comprehensive data analysis and visualization script
 - **quick_view.py**: Simple script to quickly explore HDF5 data
 
-### Pump
-- **Pump-Control-Simulation**: Pump control simulation project
-  - `Filter_Loc_P-wave.py`: Filter location P-wave analysis
-  - `README.md`: Project documentation
+
 
 ## Getting Started
 
@@ -46,12 +43,8 @@ python EyeTrack/analyze_data.py eye_tracking_data_20241201_143022.h5 --export hd
 
 ```
 RA_Work/
-├── EyeTrack/
-│   ├── Scenario.py
-│   ├── analyze_data.py
-│   └── quick_view.py
-└── Pump/
-    └── Pump-Control-Simulation/
-        ├── Filter_Loc_P-wave.py
-        └── README.md
+└── EyeTrack/
+    ├── Scenario.py
+    ├── analyze_data.py
+    └── quick_view.py
 ```
