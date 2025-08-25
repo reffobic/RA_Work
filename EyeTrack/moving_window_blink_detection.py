@@ -112,7 +112,7 @@ def detect_blink(timestamp, left_openness, right_openness):
     blink_threshold = 0.3
     return left_openness < blink_threshold and right_openness < blink_threshold
 
-def calculate_moving_window_blink_rate(df, window_size=2.0):
+def calculate_moving_window_metrics(df, window_size=2.0):
     
     results = []
     blink_threshold = 0.3
@@ -127,6 +127,7 @@ def calculate_moving_window_blink_rate(df, window_size=2.0):
             results.append({
                 'timestamp': current_time,
                 'blink_rate': 0.0,
+                'pupil_variance': 0.0,
                 'window_start': window_start,
                 'window_end': current_time,
                 'blinks_in_window': 0,
@@ -141,6 +142,7 @@ def calculate_moving_window_blink_rate(df, window_size=2.0):
             results.append({
                 'timestamp': current_time,
                 'blink_rate': 0.0,
+                'pupil_variance': 0.0,
                 'window_start': window_start,
                 'window_end': current_time,
                 'blinks_in_window': 0,
@@ -171,9 +173,16 @@ def calculate_moving_window_blink_rate(df, window_size=2.0):
         else:
             blink_rate = 0.0
         
+        # Calculate pupil diameter variance for this window
+        left_pupils = window_data['left_pupil_diam'].values
+        right_pupils = window_data['right_pupil_diam'].values
+        avg_pupils = (left_pupils + right_pupils) / 2
+        pupil_variance = np.var(avg_pupils) if len(avg_pupils) > 1 else 0.0
+        
         results.append({
             'timestamp': current_time,
             'blink_rate': blink_rate,
+            'pupil_variance': pupil_variance,
             'window_start': window_start,
             'window_end': current_time,
             'blinks_in_window': len(blinks_in_window),
@@ -234,15 +243,15 @@ def analyze_moving_window_blinks(csv_filename):
     print(df.head(10).to_string(index=False))
     print()
     
-    # Calculate moving window blink rates
+    # Calculate moving window metrics
     window_size = 2.0  # 2-second window (more sensitive to changes)
-    blink_rates_df = calculate_moving_window_blink_rate(df, window_size)
+    metrics_df = calculate_moving_window_metrics(df, window_size)
     
     print(f"Moving Window Analysis (Window Size: {window_size}s)")
     print("-" * 50)
     
     # Detect blink rate increases
-    increases = detect_blink_rate_increases(blink_rates_df, threshold_increase=0.3)
+    increases = detect_blink_rate_increases(metrics_df, threshold_increase=0.3)
     
     print("BLINK RATE INCREASE DETECTION")
     print("=" * 35)
@@ -261,22 +270,26 @@ def analyze_moving_window_blinks(csv_filename):
         print("No significant blink rate increases detected.")
         print()
     
-    # Show sample of all blink rates
-    print("SAMPLE BLINK RATES (every 3rd window):")
-    print("-" * 40)
-    for i in range(0, len(blink_rates_df), 3):
-        row = blink_rates_df.iloc[i]
-        print(f"Time {row['timestamp']:.1f}s: {row['blink_rate']:.2f} blinks/second")
+    # Show all metrics by window
+    print("METRICS BY WINDOW:")
+    print("-" * 60)
+    print("Time(s) | Blink Rate | Pupil Variance")
+    print("-" * 60)
+    for i, row in metrics_df.iterrows():
+        print(f"{row['timestamp']:6.1f}s | {row['blink_rate']:9.2f} | {row['pupil_variance']:13.4f}")
     
     # Overall statistics
     print("\nOVERALL STATISTICS")
     print("=" * 20)
     print(f"Total analysis time: {df['timestamp'].max():.1f} seconds")
-    print(f"Average blink rate: {blink_rates_df['blink_rate'].mean():.2f} blinks/second")
-    print(f"Max blink rate: {blink_rates_df['blink_rate'].max():.2f} blinks/second")
-    print(f"Min blink rate: {blink_rates_df['blink_rate'].min():.2f} blinks/second")
+    print(f"Average blink rate: {metrics_df['blink_rate'].mean():.2f} blinks/second")
+    print(f"Max blink rate: {metrics_df['blink_rate'].max():.2f} blinks/second")
+    print(f"Min blink rate: {metrics_df['blink_rate'].min():.2f} blinks/second")
+    print(f"Average pupil variance: {metrics_df['pupil_variance'].mean():.4f} mm²")
+    print(f"Max pupil variance: {metrics_df['pupil_variance'].max():.4f} mm²")
+    print(f"Min pupil variance: {metrics_df['pupil_variance'].min():.4f} mm²")
     
-    return blink_rates_df, increases
+    return metrics_df, increases
 
 def main():
     """Main function to demonstrate moving window blink detection"""
@@ -290,8 +303,8 @@ def main():
     # Create sample CSV with varying blink patterns
     csv_filename = create_sample_csv()
     
-    # Analyze moving window blink rates
-    blink_rates_df, increases = analyze_moving_window_blinks(csv_filename)
+    # Analyze moving window metrics
+    metrics_df, increases = analyze_moving_window_blinks(csv_filename)
     
     print("=" * 60)
     print("SUMMARY")
