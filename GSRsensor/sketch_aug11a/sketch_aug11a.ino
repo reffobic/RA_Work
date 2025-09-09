@@ -7,6 +7,11 @@
   if their initial rise is not extremely sharp.
 
   Required Library: "SimpleKalmanFilter" by Denys Sene.
+
+
+  3.7.9
+
+  
 */
 
 #include <SimpleKalmanFilter.h>

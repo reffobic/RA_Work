@@ -152,12 +152,11 @@ def write_buffer_to_hdf5():
                     hf[col].resize((new_size,))
                     hf[col][current_size:] = arrays[col]
                 else:
-
-                        hf.create_dataset(col, data=arrays[col], 
-                                        maxshape=(None,), 
-                                        compression='gzip', 
-                                        compression_opts=9,
-                                        chunks=True)
+                    hf.create_dataset(col, data=arrays[col], 
+                                    maxshape=(None,), 
+                                    compression='gzip', 
+                                    compression_opts=9,
+                                    chunks=True)
             
             # Store metadata
             if 'metadata' not in hf:
