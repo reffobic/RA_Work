@@ -20,19 +20,19 @@ class SimpleKalmanFilter:
         return self._current_estimate
 
 # --- Configuration ---
-SERIAL_PORT = 'COM3'  # <<< IMPORTANT: CHANGE THIS TO YOUR ARDUINO'S PORT
+SERIAL_PORT = '/dev/cu.usbmodem21301'  # <<< IMPORTANT: CHANGE THIS TO YOUR ARDUINO'S PORT
 BAUD_RATE = 9600
 CSV_FILE = 'gsr_data.csv'
 
 # --- Buffer Configuration ---
-BUFFER_SIZE = 50 # NEW: Number of readings to collect before writing to file
+BUFFER_SIZE = 50 #number of readings to collect before writing to file
 
 # --- Filter Configuration ---
 gsr_kalman_filter = SimpleKalmanFilter(mea_e=2, est_e=2, q=0.01)
 baseline_kalman_filter = SimpleKalmanFilter(mea_e=10, est_e=10, q=0.001)
 
 # --- Stress Detection Parameters ---
-PHASIC_THRESHOLD = 13.0
+PHASIC_THRESHOLD = 13.0  # Same as Arduino sketch
 REFRACTORY_PERIOD_MS = 2500
 
 # --- Global Variables ---
@@ -42,11 +42,31 @@ def get_current_time_ms():
     """Returns the current time in milliseconds using a monotonic clock."""
     return int(time.monotonic() * 1000)
 
+def detect_stress(current_signal, current_baseline):
+    """Detect stress events using the same logic as the Arduino sketch."""
+    global last_event_time_ms
+    
+    # Calculate the current phasic signal (the "wave" on top of the "tide")
+    phasic_signal = current_signal - current_baseline
+    
+    # Check if enough time has passed since the last event
+    current_time_ms = get_current_time_ms()
+    if current_time_ms - last_event_time_ms > REFRACTORY_PERIOD_MS:
+        # Check if the phasic signal (the size of the spike) is large enough
+        if phasic_signal > PHASIC_THRESHOLD:
+            print(f"*** Stress event detected at timestamp (ms): {current_time_ms} ***")
+            print(f"    Phasic signal: {phasic_signal:.2f} (threshold: {PHASIC_THRESHOLD})")
+            last_event_time_ms = current_time_ms
+            return "Stress Event"
+    
+    return ""
+
 def main():
     global last_event_time_ms
     data_buffer = [] # NEW: Initialize an empty list to act as the buffer
 
-    print("GSR Dynamic Baseline Stress Detection (with Buffered CSV Logging)")
+    print("GSR Dynamic Baseline Stress Detection (Phasic Threshold)")
+    print("Monitoring will begin immediately...")
     print("-----------------------------------------------------------------")
 
     try:
@@ -78,18 +98,17 @@ def main():
                         current_time_ms = get_current_time_ms()
                         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
                         
-                        event_detected = ""
-                        if current_time_ms - last_event_time_ms > REFRACTORY_PERIOD_MS:
-                            if phasic_signal > PHASIC_THRESHOLD:
-                                event_detected = "Stress Event"
-                                print(f"*** {event_detected} detected at {timestamp} ***")
-                                last_event_time_ms = current_time_ms
+                        # Use the same stress detection logic as Arduino sketch
+                        event_detected = detect_stress(fast_signal, slow_baseline)
                         
-                        # MODIFIED: Append the row to the buffer instead of writing directly
+                        # Optional: Uncomment the line below to see the signals for tuning
+                        print(f"Baseline:{slow_baseline:.2f}, Signal:{fast_signal:.2f}")
+                        
+                        # Append the row to the buffer instead of writing directly
                         row_data = [timestamp, raw_value, f"{fast_signal:.2f}", f"{slow_baseline:.2f}", f"{phasic_signal:.2f}", event_detected]
                         data_buffer.append(row_data)
 
-                        # NEW: Check if the buffer is full
+                        # Check if the buffer is full
                         if len(data_buffer) >= BUFFER_SIZE:
                             writer.writerows(data_buffer) # Use writerows to write all rows at once
                             print(f"--- Flushed {len(data_buffer)} rows to {CSV_FILE} ---")
@@ -101,7 +120,7 @@ def main():
     except KeyboardInterrupt:
         print("\nProgram stopped by user.")
     finally:
-        # NEW: Ensure any remaining data in the buffer is saved on exit
+        # Ensure any remaining data in the buffer is saved on exit
         if data_buffer:
             print(f"--- Saving remaining {len(data_buffer)} readings... ---")
             with open(CSV_FILE, mode='a', newline='') as file:
